@@ -10,7 +10,7 @@ import time
 # 定义一个继承自UserTaskBase的类HelloWorld
 class HelloWorld(UserTaskBase):
     def __init__(self):
-        self.ip_address = "192.168.31.151"
+        self.ip_address = "127.0.0.1"
         self.username = "admin"
         self.password = "Aa123456"
         
@@ -71,19 +71,25 @@ class HelloWorld(UserTaskBase):
         response = requests.get(url=self.sub_list, headers=headers)
         
         if response.status_code == 200:
-            # 解析数据
-            self.sub_list = response.json()
-            logger.info("成功获取订阅列表")
+            try:
+                # 解析数据并存储在新的变量中
+                sub_list_data = response.json()
+                self.sub_list_data = sub_list_data  # 将解析后的订阅列表存储在一个新属性中
+                logger.info("成功获取订阅列表")
+            except ValueError as e:
+                # 处理 JSON 解析错误
+                self.flag = 0
+                logger.error("订阅列表解析失败: %s", e)
         else:
             self.flag = 0
-            logger.info("订阅列表获取失败,任务已停止")
+            logger.error("订阅列表获取失败, 任务已停止，状态码: %d", response.status_code)
     
     def submit_serch(self):
         headers = {
             "Authorization": f"Bearer {self.access_token}"
         }
         
-        for name in self.sub_list:
+        for name in self.sub_list_data:
             search_url = self.search + str(name["id"])
             logger.info(search_url)
             
