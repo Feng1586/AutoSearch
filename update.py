@@ -102,4 +102,4 @@ class HelloWorld(UserTaskBase):
                 logger.info("遇到错误,任务已停止")
                 break
             
-            time.sleep(60)
+            time.sleep(120)
